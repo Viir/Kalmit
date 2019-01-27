@@ -1,19 +1,35 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# Script for Azure Pipelines
+# https://docs.microsoft.com/azure/devops/pipelines
 
 trigger:
 - master
 
 pool:
-  vmImage: 'Ubuntu-16.04'
+  vmImage: 'vs2017-win2016'
+
+variables:
+  buildConfiguration: 'Release'
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- script: dotnet --version
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- script: dotnet restore ./implementation/PersistentProcess/PersistentProcess.Common/PersistentProcess.Common.csproj --verbosity m
+  displayName: 'dotnet restore common'
+
+- script: dotnet restore ./implementation/PersistentProcess/PersistentProcess.Test/PersistentProcess.Test.csproj --verbosity m
+  displayName: 'dotnet restore test'
+
+- script: dotnet build ./implementation/PersistentProcess/PersistentProcess.Common/PersistentProcess.Common.csproj
+  displayName: 'dotnet build common'
+
+- script: dotnet build ./implementation/PersistentProcess/PersistentProcess.Test/PersistentProcess.Test.csproj
+  displayName: 'dotnet build test'
+
+- script: dotnet test ./implementation/PersistentProcess/PersistentProcess.Test/PersistentProcess.Test.csproj --logger trx
+  displayName: 'test'
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testRunner: VSTest
+    testResultsFiles: '**/*.trx'
