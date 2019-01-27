@@ -18,11 +18,11 @@ steps:
 - script: dotnet restore ./implementation/PersistentProcess/PersistentProcess.Common/PersistentProcess.Common.csproj --verbosity m
   displayName: 'dotnet restore common'
 
-- script: dotnet restore ./implementation/PersistentProcess/PersistentProcess.Common/PersistentProcess.Test.csproj --verbosity m
+- script: dotnet restore ./implementation/PersistentProcess/PersistentProcess.Test/PersistentProcess.Test.csproj --verbosity m
   displayName: 'dotnet restore test'
 
 - script: dotnet build ./implementation/PersistentProcess/PersistentProcess.Common/PersistentProcess.Common.csproj
   displayName: 'dotnet build common'
 
-- script: dotnet build ./implementation/PersistentProcess/PersistentProcess.Common/PersistentProcess.Test.csproj
+- script: dotnet build ./implementation/PersistentProcess/PersistentProcess.Test/PersistentProcess.Test.csproj
   displayName: 'dotnet build test'
