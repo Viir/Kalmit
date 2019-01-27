@@ -14,5 +14,16 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- script: dotnet build --configuration $(buildConfiguration)
-  displayName: 'dotnet build $(buildConfiguration)'
+- script: dotnet --version
+
+- script: dotnet restore ./implementation/PersistentProcess/PersistentProcess.Common/PersistentProcess.Common.csproj --verbosity m
+  displayName: 'dotnet restore common'
+
+- script: dotnet restore ./implementation/PersistentProcess/PersistentProcess.Common/PersistentProcess.Test.csproj --verbosity m
+  displayName: 'dotnet restore test'
+
+- script: dotnet build ./implementation/PersistentProcess/PersistentProcess.Common/PersistentProcess.Common.csproj
+  displayName: 'dotnet build common'
+
+- script: dotnet build ./implementation/PersistentProcess/PersistentProcess.Common/PersistentProcess.Test.csproj
+  displayName: 'dotnet build test'
