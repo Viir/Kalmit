@@ -133,7 +133,7 @@ namespace Kalmit.PersistentProcess
                     CommonConversion.StringBase16FromByteArray(compositionChain.Last().hash) +
                     ").");
 
-            logger?.Invoke("Composition chain is empty, default to initial state.");
+            logger?.Invoke("Found no composition record, default to initial state.");
 
             lastStateHash = emptyInitHash;
         }
