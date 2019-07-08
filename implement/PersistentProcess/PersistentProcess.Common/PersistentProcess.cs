@@ -113,6 +113,7 @@ namespace Kalmit.PersistentProcess
                             lastStateHash = followingComposition.hash;
                         }
 
+                        logger?.Invoke("Restored the process state in " + ((int)restoreStopwatch.Elapsed.TotalSeconds) + " seconds.");
                         return;
                     }
 
@@ -132,7 +133,7 @@ namespace Kalmit.PersistentProcess
                     CommonConversion.StringBase16FromByteArray(compositionChain.Last().hash) +
                     ").");
 
-            logger?.Invoke("Restored the process state in " + ((int)restoreStopwatch.Elapsed.TotalSeconds) + " seconds.");
+            logger?.Invoke("Composition chain is empty, default to initial state.");
 
             lastStateHash = emptyInitHash;
         }
