@@ -12,8 +12,7 @@ namespace Kalmit
         static public string CacheDirectory =>
             Path.Combine(
                 Environment.GetEnvironmentVariable(
-                    RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "LOCALAPPDATA" : "HOME",
-                    EnvironmentVariableTarget.User),
+                    RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "LOCALAPPDATA" : "HOME"),
                 "kalmit", ".cache");
 
         static public IReadOnlyCollection<(string name, byte[] content)> GetAllFilesFromDirectory(string directoryPath) =>
