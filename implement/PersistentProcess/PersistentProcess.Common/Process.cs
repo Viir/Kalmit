@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
-using V8.Net;
+using PuppeteerSharp;
 
 namespace Kalmit
 {
@@ -29,16 +29,35 @@ namespace Kalmit
 
     class ProcessHostedWithChakraCore : IDisposableProcessWithStringInterface
     {
-        readonly V8Engine v8Engine;
+        readonly Browser browser;
+
+        readonly Page browserPage;
 
         public ProcessHostedWithChakraCore(string javascriptPreparedToRun)
         {
-            v8Engine = new V8Engine();
+            var browserFetcher = Puppeteer.CreateBrowserFetcher(new BrowserFetcherOptions
+            {
+            });
 
-            var initAppResult = v8Engine.Execute(javascriptPreparedToRun);
+            var revisionInfo = browserFetcher.DownloadAsync(BrowserFetcher.DefaultRevision).Result;
+            browser = Puppeteer.LaunchAsync(
+                new LaunchOptions
+                {
+                    Headless = true,
+                    Args = new[]
+                    {
+                        "--no-sandbox"
+                    },
+                    ExecutablePath = revisionInfo.ExecutablePath
+                }).Result;
 
-            var resetAppStateResult = v8Engine.Execute(
-                ProcessFromElm019Code.appStateJsVarName + " = " + ProcessFromElm019Code.initStateJsFunctionPublishedSymbol + ";");
+            browserPage = browser.NewPageAsync().Result;
+
+            var initAppResult = browserPage.EvaluateExpressionAsync(javascriptPreparedToRun).Result;
+
+            var resetAppStateResult = browserPage.EvaluateExpressionAsync(
+                ProcessFromElm019Code.appStateJsVarName + " = " + ProcessFromElm019Code.initStateJsFunctionPublishedSymbol + ";")
+                .Result;
         }
 
         static string AsJavascriptExpression(string originalString) =>
@@ -46,7 +65,8 @@ namespace Kalmit
 
         public void Dispose()
         {
-            v8Engine?.Dispose();
+            browserPage?.Dispose();
+            browser?.Dispose();
         }
 
         public string ProcessEvent(string serializedEvent)
@@ -81,9 +101,9 @@ namespace Kalmit
 
         string EvaluateInJsEngineAndReturnResultAsString(string expressionJavascript)
         {
-            var evalResult = v8Engine.Execute(expressionJavascript);
+            var evalResult = browserPage.EvaluateExpressionAsync(expressionJavascript).Result;
 
-            return evalResult.AsString;
+            return evalResult?.ToString();
         }
     }
 
