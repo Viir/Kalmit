@@ -93,7 +93,7 @@ namespace Kalmit
 
         string EvaluateInJsEngineAndReturnResultAsString(string expressionJavascript)
         {
-            var evalResult = browserPage.EvaluateExpressionAsync(expressionJavascript);
+            var evalResult = browserPage.EvaluateExpressionAsync(expressionJavascript).Result;
 
             return evalResult?.ToString();
         }
