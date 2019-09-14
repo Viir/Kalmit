@@ -5,8 +5,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.NodeServices;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using PuppeteerSharp;
 
 namespace Kalmit
 {
@@ -29,12 +30,15 @@ namespace Kalmit
 
     class ProcessHostedWithChakraCore : IDisposableProcessWithStringInterface
     {
-        readonly Browser browser;
-
-        readonly Page browserPage;
-
         public ProcessHostedWithChakraCore(string javascriptPreparedToRun)
         {
+            var services = new Microsoft.Extensions.DependencyInjection.ServiceCollection();
+            var serviceProvider = services.BuildServiceProvider();
+
+            var options = new NodeServicesOptions(serviceProvider) { /* Assign/override any other options here */ };
+            var nodeServices = NodeServicesFactory.CreateNodeServices(options);
+
+            /*
             var browserFetcher = Puppeteer.CreateBrowserFetcher(new BrowserFetcherOptions
             {
             });
@@ -58,6 +62,7 @@ namespace Kalmit
             var resetAppStateResult = browserPage.EvaluateExpressionAsync(
                 ProcessFromElm019Code.appStateJsVarName + " = " + ProcessFromElm019Code.initStateJsFunctionPublishedSymbol + ";")
                 .Result;
+             */
         }
 
         static string AsJavascriptExpression(string originalString) =>
@@ -65,8 +70,10 @@ namespace Kalmit
 
         public void Dispose()
         {
+            /*
             browserPage?.Dispose();
             browser?.Dispose();
+            */
         }
 
         public string ProcessEvent(string serializedEvent)
@@ -101,9 +108,14 @@ namespace Kalmit
 
         string EvaluateInJsEngineAndReturnResultAsString(string expressionJavascript)
         {
+            /*
+            TODO
             var evalResult = browserPage.EvaluateExpressionAsync(expressionJavascript).Result;
 
             return evalResult?.ToString();
+             */
+
+            throw new NotImplementedException();
         }
     }
 
