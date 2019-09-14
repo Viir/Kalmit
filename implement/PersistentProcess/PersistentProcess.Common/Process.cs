@@ -5,9 +5,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using JavaScriptEngineSwitcher.ChakraCore;
-using JavaScriptEngineSwitcher.Core;
 using Newtonsoft.Json;
+using PuppeteerSharp;
 
 namespace Kalmit
 {
@@ -30,23 +29,27 @@ namespace Kalmit
 
     class ProcessHostedWithChakraCore : IDisposableProcessWithStringInterface
     {
-        readonly IJsEngine javascriptEngine;
+        readonly Browser browser;
 
+        readonly Page browserPage;
 
         public ProcessHostedWithChakraCore(string javascriptPreparedToRun)
         {
-            javascriptEngine = new ChakraCoreJsEngine(
-                new ChakraCoreSettings
-                {
-                    DisableEval = true,
-                    EnableExperimentalFeatures = true
-                }
-            );
+            var browserFetcher = Puppeteer.CreateBrowserFetcher(new BrowserFetcherOptions
+            {
+            });
 
-            var initAppResult = javascriptEngine.Evaluate(javascriptPreparedToRun);
+            var revisionInfo = browserFetcher.DownloadAsync(BrowserFetcher.DefaultRevision).Result;
+            browser = Puppeteer.LaunchAsync(
+                new LaunchOptions { Headless = true, ExecutablePath = revisionInfo.ExecutablePath }).Result;
 
-            var resetAppStateResult = javascriptEngine.Evaluate(
-                ProcessFromElm019Code.appStateJsVarName + " = " + ProcessFromElm019Code.initStateJsFunctionPublishedSymbol + ";");
+            browserPage = browser.NewPageAsync().Result;
+
+            var initAppResult = browserPage.EvaluateExpressionAsync(javascriptPreparedToRun).Result;
+
+            var resetAppStateResult = browserPage.EvaluateExpressionAsync(
+                ProcessFromElm019Code.appStateJsVarName + " = " + ProcessFromElm019Code.initStateJsFunctionPublishedSymbol + ";")
+                .Result;
         }
 
         static string AsJavascriptExpression(string originalString) =>
@@ -54,7 +57,8 @@ namespace Kalmit
 
         public void Dispose()
         {
-            javascriptEngine?.Dispose();
+            browserPage?.Dispose();
+            browser?.Dispose();
         }
 
         public string ProcessEvent(string serializedEvent)
@@ -89,7 +93,7 @@ namespace Kalmit
 
         string EvaluateInJsEngineAndReturnResultAsString(string expressionJavascript)
         {
-            var evalResult = javascriptEngine.Evaluate(expressionJavascript);
+            var evalResult = browserPage.EvaluateExpressionAsync(expressionJavascript);
 
             return evalResult?.ToString();
         }
