@@ -41,7 +41,15 @@ namespace Kalmit
 
             var revisionInfo = browserFetcher.DownloadAsync(BrowserFetcher.DefaultRevision).Result;
             browser = Puppeteer.LaunchAsync(
-                new LaunchOptions { Headless = true, ExecutablePath = revisionInfo.ExecutablePath }).Result;
+                new LaunchOptions
+                {
+                    Headless = true,
+                    Args = new[]
+                    {
+                        "--no-sandbox"
+                    },
+                    ExecutablePath = revisionInfo.ExecutablePath
+                }).Result;
 
             browserPage = browser.NewPageAsync().Result;
 
