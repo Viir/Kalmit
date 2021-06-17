@@ -1,3 +1,5 @@
+This project has moved to https://github.com/elm-fullstack/elm-fullstack
+
 # Elm Full-Stack
 
 In this repository, I share what I learn about building full-stack apps using the [Elm programming language](https://elm-lang.org). This approach emerged out of the development of online multiplayer video games like [DRTS](https://drtsgame.com).
